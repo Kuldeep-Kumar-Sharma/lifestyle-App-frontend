@@ -48,7 +48,7 @@ function App() {
         <Route path="/" element={<Home />}></Route>
         <Route path="/logevents" element={<LogEvents />}></Route>
         <Route path="/logemotions" element={<LogEmotions />}></Route>
-        <Route path="/dailyJo urnal" element={<DailyJournal />}></Route>
+        <Route path="/dailyJournal" element={<DailyJournal />}></Route>
         <Route path="/planning" element={<Plan />}></Route>
         <Route path="/longtermGoal" element={<LongtermGoal />}></Route>
       </Routes>

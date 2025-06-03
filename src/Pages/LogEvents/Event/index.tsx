@@ -2,7 +2,6 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import { Event as EventModel } from "@model/Event"; // Importing the Event model
-import "./index.css";
 
 interface EventProps {
   event: EventModel; // Using the Event model as a prop type

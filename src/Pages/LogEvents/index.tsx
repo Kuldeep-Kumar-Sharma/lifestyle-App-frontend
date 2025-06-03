@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import Event from "./Event"; // Importing the Event component
 import "./index.css";
 
 function LogEvents() {
@@ -57,6 +58,29 @@ function LogEvents() {
     }
   };
 
+  const events = [
+    {
+      name: "Event 1",
+      date: "2023-10-01",
+      time: "10:00 AM",
+      description: "Description for Event 1",
+      location: "Location 1",
+    },
+    {
+      name: "Event 2",
+      date: "2023-10-02",
+      time: "11:00 AM",
+      description: "Description for Event 2",
+      location: "Location 2",
+    },
+    {
+      name: "Event 3",
+      date: "2023-10-03",
+      time: "12:00 PM",
+      description: "Description for Event 3",
+      location: "Location 3",
+    },];
+  
   return (
     <Container className="mt-5">
       <h1>Log Event</h1>
@@ -109,8 +133,11 @@ function LogEvents() {
           Log Event
         </Button>
       </Form>
-    </Container>
-  );
+      {events.map((event, index) => (
+        <Container key={index} className="mt-4">
+          <Event event={event} />
+        </Container>))}
+    </Container>);
 }
 
 export default LogEvents;
