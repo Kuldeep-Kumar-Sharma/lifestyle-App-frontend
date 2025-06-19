@@ -1,143 +1,137 @@
 import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
-import Event from "./Event"; // Importing the Event component
-import "./index.css";
+import EventCard from "./EventCard";
+import { Event } from "@model/Event";
+import { v4 as uuidv4 } from "uuid";
 
 function LogEvents() {
   const [formData, setFormData] = useState({
-    eventName: "",
-    eventDate: "",
-    eventDescription: "",
+    name: "",
+    description: "",
+    date: "",
+    time: "",
+    location: "",
   });
-  const [errors, setErrors] = useState({
-    eventName: "",
-    eventDate: "",
-    eventDescription: "",
-  });
-  const [successMessage, setSuccessMessage] = useState("");
+  const [events, setEvents] = useState<Event[]>([]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" }); // Clear errors on input change
-  };
-
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = { eventName: "", eventDate: "", eventDescription: "" };
-
-    if (!formData.eventName.trim()) {
-      newErrors.eventName = "Event name is required.";
-      isValid = false;
-    }
-
-    if (!formData.eventDate.trim()) {
-      newErrors.eventDate = "Event date is required.";
-      isValid = false;
-    }
-
-    if (!formData.eventDescription.trim()) {
-      newErrors.eventDescription = "Event description is required.";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
+    setError("");
+    setSuccess("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setSuccessMessage("Event logged successfully!");
-      setFormData({ eventName: "", eventDate: "", eventDescription: "" }); // Reset form
+    if (
+      !formData.name.trim() ||
+      !formData.description.trim() ||
+      !formData.date.trim() ||
+      !formData.time.trim() ||
+      !formData.location.trim()
+    ) {
+      setError("All fields are required.");
+      setSuccess("");
+      return;
     }
+    setEvents([
+      {
+        id: uuidv4(),
+        ...formData,
+      },
+      ...events,
+    ]);
+    setFormData({
+      name: "",
+      description: "",
+      date: "",
+      time: "",
+      location: "",
+    });
+    setError("");
+    setSuccess("Event logged successfully!");
   };
 
-  const events = [
-    {
-      name: "Event 1",
-      date: "2023-10-01",
-      time: "10:00 AM",
-      description: "Description for Event 1",
-      location: "Location 1",
-    },
-    {
-      name: "Event 2",
-      date: "2023-10-02",
-      time: "11:00 AM",
-      description: "Description for Event 2",
-      location: "Location 2",
-    },
-    {
-      name: "Event 3",
-      date: "2023-10-03",
-      time: "12:00 PM",
-      description: "Description for Event 3",
-      location: "Location 3",
-    },];
-  
   return (
-    <Container className="mt-5">
+    <Container className="mt-4">
       <h1>Log Event</h1>
-      {successMessage && <Alert variant="success">{successMessage}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="eventName">
-          <Form.Label>Event Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="eventName"
-            value={formData.eventName}
-            onChange={handleChange}
-            isInvalid={!!errors.eventName}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.eventName}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="eventDate">
-          <Form.Label>Event Date</Form.Label>
-          <Form.Control
-            type="date"
-            name="eventDate"
-            value={formData.eventDate}
-            onChange={handleChange}
-            isInvalid={!!errors.eventDate}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.eventDate}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="eventDescription">
-          <Form.Label>Event Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            name="eventDescription"
-            value={formData.eventDescription}
-            onChange={handleChange}
-            isInvalid={!!errors.eventDescription}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.eventDescription}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Button variant="primary" type="submit">
-          Log Event
-        </Button>
-      </Form>
-      {events.map((event, index) => (
-        <Container key={index} className="mt-4">
-          <Event event={event} />
-        </Container>))}
-    </Container>);
+      <Tabs defaultActiveKey="addEvent" id="event-tabs" className="mb-3">
+        <Tab eventKey="addEvent" title="Add Event">
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="eventName">
+              <Form.Label>Event Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter event name"
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter event description"
+                rows={3}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventDate">
+              <Form.Label>Date</Form.Label>
+              <Form.Control
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventTime">
+              <Form.Label>Time</Form.Label>
+              <Form.Control
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventLocation">
+              <Form.Label>Location</Form.Label>
+              <Form.Control
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="Enter event location"
+              />
+            </Form.Group>
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
+            <Button type="submit" variant="primary">
+              Save Event
+            </Button>
+          </Form>
+        </Tab>
+        <Tab eventKey="pastEvents" title="Past Events">
+          {events.length === 0 && <div>No events logged yet.</div>}
+          {events.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </Tab>
+      </Tabs>
+    </Container>
+  );
 }
 
 export default LogEvents;
