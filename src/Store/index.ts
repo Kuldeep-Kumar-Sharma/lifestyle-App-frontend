@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import journalReducer from "./journalSlice";
 import eventReducer from "./eventSlice";
+import planReducer from "./eventSlice";
 
 const store = configureStore({
   reducer: {
     journal: journalReducer,
     event: eventReducer,
+    plan: planReducer, 
     // Add more slices here as your app grows
   },
 });
