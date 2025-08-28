@@ -4,18 +4,26 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
-import { FaTrash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import {
+  addGoal,
+  deleteGoal,
+  toggleTaskCompletion,
+  Task,
+} from "../../store/goalSlice";
 import "./index.css";
 
-type Task = { name: string; completed: boolean };
-type Goal = { name: string; years: number; tasks: Task[] };
-
 function LongtermGoal() {
-  const [goals, setGoals] = useState<Goal[]>([]);
+  // Local state for form inputs only
   const [goalName, setGoalName] = useState<string>("");
   const [targetYears, setTargetYears] = useState<number>(1);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskInput, setTaskInput] = useState<string>("");
+
+  // Redux
+  const dispatch = useDispatch();
+  const goals = useSelector((state: RootState) => state.goals.goals);
 
   const addTask = () => {
     if (taskInput.trim()) {
@@ -24,20 +32,29 @@ function LongtermGoal() {
     }
   };
 
-  const addGoal = () => {
+  const handleAddGoal = () => {
     if (goalName.trim() && tasks.length > 0) {
-      setGoals([
-        ...goals,
-        { name: goalName, years: targetYears, tasks: tasks },
-      ]);
+      dispatch(
+        addGoal({
+          name: goalName,
+          years: targetYears,
+          tasks: tasks,
+        })
+      );
+
+      // Reset form
       setGoalName("");
       setTargetYears(1);
       setTasks([]);
     }
   };
 
-  const deleteGoal = (idx: number) => {
-    setGoals(goals.filter((_, i) => i !== idx));
+  const handleDeleteGoal = (id: string) => {
+    dispatch(deleteGoal(id));
+  };
+
+  const handleToggleTask = (goalId: string, taskIndex: number) => {
+    dispatch(toggleTaskCompletion({ goalId, taskIndex }));
   };
 
   return (
@@ -81,7 +98,7 @@ function LongtermGoal() {
                 ))}
               </ListGroup>
             </Form.Group>
-            <Button className="mt-3" onClick={addGoal}>
+            <Button className="mt-3" onClick={handleAddGoal}>
               Add Goal
             </Button>
           </Form>
@@ -89,8 +106,8 @@ function LongtermGoal() {
       </Card>
 
       <h4>Long-term Goals</h4>
-      {goals.map((goal, idx) => (
-        <Card className="mb-3" key={idx}>
+      {goals.map((goal) => (
+        <Card className="mb-3" key={goal.id}>
           <Card.Body>
             <div className="d-flex justify-content-between">
               <div>
@@ -102,7 +119,7 @@ function LongtermGoal() {
                         type="checkbox"
                         label={task.name}
                         checked={task.completed}
-                        readOnly
+                        onChange={() => handleToggleTask(goal.id, tIdx)}
                       />
                     </ListGroup.Item>
                   ))}
@@ -110,10 +127,10 @@ function LongtermGoal() {
               </div>
               <Button
                 variant="outline-danger"
-                onClick={() => deleteGoal(idx)}
+                onClick={() => handleDeleteGoal(goal.id)}
                 size="sm"
               >
-              {/* <FaTrash /> */}
+                Delete
               </Button>
             </div>
           </Card.Body>
